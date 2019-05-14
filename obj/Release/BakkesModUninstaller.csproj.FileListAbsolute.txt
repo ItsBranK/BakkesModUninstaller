@@ -1,0 +1,10 @@
+C:\Users\BranK\Documents\Visual Studio 2019\Projects\BakkesModUninstaller\BakkesModUninstaller\bin\Release\BakkesModUninstaller.exe.config
+C:\Users\BranK\Documents\Visual Studio 2019\Projects\BakkesModUninstaller\BakkesModUninstaller\bin\Release\BakkesModUninstaller.exe
+C:\Users\BranK\Documents\Visual Studio 2019\Projects\BakkesModUninstaller\BakkesModUninstaller\bin\Release\BakkesModUninstaller.pdb
+C:\Users\BranK\Documents\Visual Studio 2019\Projects\BakkesModUninstaller\BakkesModUninstaller\obj\Release\BakkesModUninstaller.MainFrm.resources
+C:\Users\BranK\Documents\Visual Studio 2019\Projects\BakkesModUninstaller\BakkesModUninstaller\obj\Release\BakkesModUninstaller.Properties.Resources.resources
+C:\Users\BranK\Documents\Visual Studio 2019\Projects\BakkesModUninstaller\BakkesModUninstaller\obj\Release\BakkesModUninstaller.csproj.GenerateResource.cache
+C:\Users\BranK\Documents\Visual Studio 2019\Projects\BakkesModUninstaller\BakkesModUninstaller\obj\Release\BakkesModUninstaller.csproj.CoreCompileInputs.cache
+C:\Users\BranK\Documents\Visual Studio 2019\Projects\BakkesModUninstaller\BakkesModUninstaller\obj\Release\BakkesModUninstaller.exe
+C:\Users\BranK\Documents\Visual Studio 2019\Projects\BakkesModUninstaller\BakkesModUninstaller\obj\Release\BakkesModUninstaller.pdb
+C:\Users\BranK\Documents\Visual Studio 2019\Projects\BakkesModUninstaller\BakkesModUninstaller\obj\Release\BakkesModUninstaller.csprojAssemblyReference.cache
