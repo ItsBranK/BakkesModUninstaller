@@ -19,9 +19,6 @@ namespace BakkesModUninstaller
         Boolean LogError = false;
         Boolean PickDirectory = false;
         string DirectoryPath;
-        string DirectoryEx;
-        string RegistryEx;
-        string LogEx;
 
         public MainFrm()
         {
@@ -47,22 +44,7 @@ namespace BakkesModUninstaller
             string MyDocuments = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             string LogDir = MyDocuments + "\\My Games\\Rocket League\\TAGame\\Logs\\";
             string LogFile = LogDir + "launch.log";
-            if (PickDirectory == true)
-            {
-                OpenFileDialog OFD = new OpenFileDialog
-                {
-                    Title = "Select RocketLeague.exe",
-                    Filter = "EXE Files (*.exe)|*.exe"
-                };
-
-                if (OFD.ShowDialog() == DialogResult.OK)
-                {
-                    string FilePath = OFD.FileName;
-                    FilePath = FilePath.Replace("RocketLeague.exe", "");
-                    DirectoryPath = FilePath;
-                }
-            }
-            else
+            if (!PickDirectory == true)
             {
                 if (File.Exists(LogFile))
                 {
@@ -80,6 +62,20 @@ namespace BakkesModUninstaller
                             }
                         }
                     }
+                }
+            }
+            else
+            {
+                OpenFileDialog OFD = new OpenFileDialog
+                {
+                    Title = "Select RocketLeague.exe",
+                    Filter = "EXE Files (*.exe)|*.exe"
+                };
+                if (OFD.ShowDialog() == DialogResult.OK)
+                {
+                    string FilePath = OFD.FileName;
+                    FilePath = FilePath.Replace("RocketLeague.exe", "");
+                    DirectoryPath = FilePath;
                 }
             }
             RemoveDirectory();
@@ -100,10 +96,9 @@ namespace BakkesModUninstaller
                 {
                     Directory.Delete(FolderPath, true);
                 }
-                catch (Exception Ex)
+                catch (Exception)
                 {
                     DirectoryError = true;
-                    DirectoryEx = Ex.ToString();
                 }
             }
             RemoveLog();
@@ -111,17 +106,28 @@ namespace BakkesModUninstaller
 
         public void RemoveLog()
         {
-            string LogPath = Path.GetTempPath() + "injectorlog.log";
-            if (File.Exists(LogPath))
+            string BakkesLog = Path.GetTempPath() + "injectorlog.log";
+            string BranksLog = Path.GetTempPath() + "branksmod.log";
+            if (File.Exists(BakkesLog))
             {
                 try
                 {
-                    File.Delete(LogPath);
+                    File.Delete(BakkesLog);
                 }
-                catch (Exception Ex)
+                catch (Exception)
                 {
                     LogError = true;
-                    LogEx = Ex.ToString();
+                }
+            }
+            if (File.Exists(BranksLog))
+            {
+                try
+                {
+                    File.Delete(BranksLog);
+                }
+                catch (Exception)
+                {
+
                 }
             }
             RemoveRegistry();
@@ -134,10 +140,9 @@ namespace BakkesModUninstaller
             {
                 Key.DeleteValue("BakkesMod", false);
             }
-            catch (Exception Ex)
+            catch (Exception)
             {
                 RegistryError = true;
-                RegistryEx = Ex.ToString();
             }
             ConfirmUninstall();
         }
