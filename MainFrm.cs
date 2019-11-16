@@ -14,11 +14,10 @@ namespace BakkesModUninstaller
 {
     public partial class MainFrm : Form
     {
-        Boolean DirectoryError = false;
-        Boolean RegistryError = false;
-        Boolean LogError = false;
-        Boolean PickDirectory = false;
-        string DirectoryPath;
+        bool DIRECTORY_ERROR;
+        bool REGISTRY_ERROR;
+        bool LOG_ERROR;
+        string WIN32_FOLDER;
 
         public MainFrm()
         {
@@ -28,10 +27,12 @@ namespace BakkesModUninstaller
         private void MainFrm_Load(object sender, EventArgs e)
         {
             this.Hide();
+
             DialogResult dialogResult = MessageBox.Show("Are you sure you want to uninstall BakkesMod? This will remove all files and registry keys.", "BakkesMod Uninstaller", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            
             if (dialogResult == DialogResult.Yes)
             {
-                GetDirectory();
+                getDirectory(false);
             }
             else if (dialogResult == DialogResult.No)
             {
@@ -39,25 +40,26 @@ namespace BakkesModUninstaller
             }
         }
 
-        public void GetDirectory()
+        public void getDirectory(bool pickDirectory)
         {
-            string MyDocuments = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            string LogDir = MyDocuments + "\\My Games\\Rocket League\\TAGame\\Logs\\";
-            string LogFile = LogDir + "launch.log";
-            if (!PickDirectory == true)
+            string  myDocuments = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            string logDirectory = myDocuments + "\\My Games\\Rocket League\\TAGame\\Logs\\launch.log";
+
+            if (pickDirectory == false)
             {
-                if (File.Exists(LogFile))
+                if (File.Exists(logDirectory))
                 {
-                    string Line;
-                    using (FileStream Stream = File.Open(LogFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                    string line;
+
+                    using (FileStream stream = File.Open(logDirectory, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                     {
-                        StreamReader File = new StreamReader(Stream);
-                        while ((Line = File.ReadLine()) != null)
+                        StreamReader file = new StreamReader(stream);
+                        while ((line = file.ReadLine()) != null)
                         {
-                            if (Line.Contains("Init: Base directory: "))
+                            if (line.Contains("Init: Base directory: "))
                             {
-                                Line = Line.Replace("Init: Base directory: ", "");
-                                DirectoryPath = Line;
+                                line = line.Replace("Init: Base directory: ", "");
+                                WIN32_FOLDER = line;
                                 break;
                             }
                         }
@@ -66,124 +68,175 @@ namespace BakkesModUninstaller
             }
             else
             {
-                OpenFileDialog OFD = new OpenFileDialog
+                OpenFileDialog ofd = new OpenFileDialog
                 {
                     Title = "Select RocketLeague.exe",
                     Filter = "EXE Files (*.exe)|*.exe"
                 };
-                if (OFD.ShowDialog() == DialogResult.OK)
+
+                if (ofd.ShowDialog() == DialogResult.OK)
                 {
-                    string FilePath = OFD.FileName;
+                    string FilePath = ofd.FileName;
+
                     FilePath = FilePath.Replace("RocketLeague.exe", "");
-                    DirectoryPath = FilePath;
+                    WIN32_FOLDER = FilePath;
                 }
             }
-            RemoveDirectory();
+
+            removeDirectory();
         }
 
-        public void RemoveDirectory()
+        public void removeDirectory()
         {
-            string FolderPath = DirectoryPath + "bakkesmod";
-            if (!Directory.Exists(FolderPath))
+            string BAKKESMOD_FOLDER = WIN32_FOLDER + "\\bakkesmod";
+
+            if (!Directory.Exists(BAKKESMOD_FOLDER))
             {
-                MessageBox.Show("Could not find the directory, please manually point to where your RocketLeague.exe is located.", "BakkesMod Uninstaller", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                PickDirectory = true;
-                GetDirectory();
+                MessageBox.Show("Could not find your BakkesMod folder, please manually point to where your RocketLeague.exe is located.", "BakkesMod Uninstaller", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                getDirectory(true);
             }
             else
             {
                 try
                 {
-                    Directory.Delete(FolderPath, true);
+                    Directory.Delete(BAKKESMOD_FOLDER, true);
+                    DIRECTORY_ERROR = false;
                 }
                 catch (Exception)
                 {
-                    DirectoryError = true;
+                    DIRECTORY_ERROR = true;
                 }
             }
-            RemoveLog();
+
+            removeLogs();
         }
 
-        public void RemoveLog()
+        public void removeLogs()
         {
-            string BakkesLog = Path.GetTempPath() + "injectorlog.log";
-            string BranksLog = Path.GetTempPath() + "branksmod.log";
-            if (File.Exists(BakkesLog))
+            string INJECTOR_LOG = Path.GetTempPath() + "\\injectorlog.log";
+            string INJECTOR_CS_LOG = Path.GetTempPath() + "\\BakkesModInjectorCs.log";
+            string BRANKS_LOG = Path.GetTempPath() + "\\branksmod.log";
+
+
+            if (File.Exists(INJECTOR_LOG))
             {
                 try
                 {
-                    File.Delete(BakkesLog);
+                    File.Delete(INJECTOR_LOG);
+                    LOG_ERROR = false;
                 }
                 catch (Exception)
                 {
-                    LogError = true;
+                    LOG_ERROR = true;
                 }
             }
-            if (File.Exists(BranksLog))
+
+            if (File.Exists(INJECTOR_CS_LOG))
             {
                 try
                 {
-                    File.Delete(BranksLog);
+                    File.Delete(INJECTOR_CS_LOG);
                 }
                 catch (Exception)
                 {
 
                 }
             }
-            RemoveRegistry();
+
+            if (File.Exists(BRANKS_LOG))
+            {
+                try
+                {
+                    File.Delete(BRANKS_LOG);
+                }
+                catch (Exception)
+                {
+                    
+                }
+            }
+
+            removeRegistry();
         }
 
-        public void RemoveRegistry()
+        public void removeRegistry()
         {
-            RegistryKey Key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
-            try
+            RegistryKey key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+
+            string[] names = key.GetValueNames();
+
+            if (names.Contains("BakkesMod"))
             {
-                Key.DeleteValue("BakkesMod", false);
+                try
+                {
+                    key.DeleteValue("BakkesMod", false);
+                    REGISTRY_ERROR = false;
+                }
+                catch (Exception)
+                {
+                    REGISTRY_ERROR = true;
+                }
             }
-            catch (Exception)
+
+            if (names.Contains("BakkesModInjectorCs"))
             {
-                RegistryError = true;
+                try
+                {
+                    key.DeleteValue("BakkesModInjectorCs", false);
+                }
+                catch (Exception)
+                {
+
+                }
             }
-            ConfirmUninstall();
+
+            if (names.Contains("BranksMod"))
+            {
+                try
+                {
+                    key.DeleteValue("BranksMod", false);
+                }
+                catch (Exception)
+                {
+
+                }
+            }
+
+            confirmUninstall();
         }
 
-        public void ConfirmUninstall()
+        public void confirmUninstall()
         {
-            if (DirectoryError == true || RegistryError == true || LogError == true)
+            if (DIRECTORY_ERROR == true)
             {
-                if (DirectoryError == true)
+                DialogResult directoryResult = MessageBox.Show("There was an error trying to remove the directory, would you like to try again?", "BakkesMod Uninstaller", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
+                
+                if (directoryResult == DialogResult.Yes)
                 {
-                    DialogResult DirectoryResult = MessageBox.Show("There was an error trying to remove the directory, would you like to try again?", "BakkesMod Uninstaller", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
-                    if (DirectoryResult == DialogResult.Yes)
-                    {
-                        RemoveDirectory();
-                    }
+                    removeDirectory();
                 }
-                else if (RegistryError == true)
+            }
+            else if (REGISTRY_ERROR == true)
+            {
+                DialogResult registryResult = MessageBox.Show("There was an error trying to remove the startup registry, would you like to try again?", "BakkesMod Uninstaller", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
+                
+                if (registryResult == DialogResult.Yes)
                 {
-                    DialogResult RegistryResult = MessageBox.Show("There was an error trying to remove the startup registry, would you like to try again?", "BakkesMod Uninstaller", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
-                    if (RegistryResult == DialogResult.Yes)
-                    {
-                        RemoveRegistry();
-                    }
+                    removeRegistry();
                 }
-                else if (LogError == true)
+            }
+            else if (LOG_ERROR == true)
+            {
+                DialogResult registryResult = MessageBox.Show("There was an error trying to remove the log files, would you like to try again?", "BakkesMod Uninstaller", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
+                
+                if (registryResult == DialogResult.Yes)
                 {
-                    DialogResult RegistryResult = MessageBox.Show("There was an error trying to remove the log files, would you like to try again?", "BakkesMod Uninstaller", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
-                    if (RegistryResult == DialogResult.Yes)
-                    {
-                        RemoveLog();
-                    }
-                }
-                else
-                {
-                    this.Close();
+                    removeLogs();
                 }
             }
             else
             {
                 MessageBox.Show("BakkesMod has successfully been uninstalled.", "BakkesMod Uninstaller", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                this.Close();
+                Environment.Exit(1);
             }
         }
     }
