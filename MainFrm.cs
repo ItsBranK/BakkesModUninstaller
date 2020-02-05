@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using Microsoft.Win32;
-using System.Diagnostics;
 
 namespace BakkesModUninstaller
 {
@@ -37,11 +36,6 @@ namespace BakkesModUninstaller
             }
             else if (dialogResult == DialogResult.No)
             {
-                if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + "\\BakkesModInjectorCs.exe"))
-                {
-                    Process.Start(AppDomain.CurrentDomain.BaseDirectory + "\\BakkesModInjectorCs.exe");
-                }
-
                 Environment.Exit(1);
             }
         }
