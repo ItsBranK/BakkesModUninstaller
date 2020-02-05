@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using Microsoft.Win32;
+using System.Diagnostics;
 
 namespace BakkesModUninstaller
 {
@@ -36,7 +37,12 @@ namespace BakkesModUninstaller
             }
             else if (dialogResult == DialogResult.No)
             {
-                this.Close();
+                if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + "\\BakkesModInjectorCs.exe"))
+                {
+                    Process.Start(AppDomain.CurrentDomain.BaseDirectory + "\\BakkesModInjectorCs.exe");
+                }
+
+                Environment.Exit(1);
             }
         }
 
@@ -89,6 +95,8 @@ namespace BakkesModUninstaller
         public void removeDirectory()
         {
             string BAKKESMOD_FOLDER = WIN32_FOLDER + "\\bakkesmod";
+            string WKSCLI_WIN32 = WIN32_FOLDER + "\\wkscli.dll";
+            string WKSCLI_TEMP = Path.GetTempPath() + "\\wkscli.dll";
 
             if (!Directory.Exists(BAKKESMOD_FOLDER))
             {
@@ -105,6 +113,30 @@ namespace BakkesModUninstaller
                 catch (Exception)
                 {
                     DIRECTORY_ERROR = true;
+                }
+            }
+
+            if (File.Exists(WKSCLI_WIN32))
+            {
+                try
+                {
+                    File.Delete(WKSCLI_WIN32);
+                }
+                catch
+                {
+
+                }
+            }
+
+            if (File.Exists(WKSCLI_TEMP))
+            {
+                try
+                {
+                    File.Delete(WKSCLI_TEMP);
+                }
+                catch
+                {
+
                 }
             }
 
@@ -217,7 +249,7 @@ namespace BakkesModUninstaller
             }
             else if (REGISTRY_ERROR == true)
             {
-                DialogResult registryResult = MessageBox.Show("There was an error trying to remove the startup registry, would you like to try again?", "BakkesMod Uninstaller", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
+                DialogResult registryResult = MessageBox.Show("There was an error trying to remove the startup registry keys, would you like to try again?", "BakkesMod Uninstaller", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
                 
                 if (registryResult == DialogResult.Yes)
                 {
