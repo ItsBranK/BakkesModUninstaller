@@ -44,7 +44,7 @@ namespace BakkesModUninstaller
         {
             if (!manuallyChooseDir)
             {
-                string directory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\bakkesmod\\bakkesmod";
+                string directory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\bakkesmod";
 
                 if (Directory.Exists(directory))
                     BAKKESMOD_FOLDER = directory;
